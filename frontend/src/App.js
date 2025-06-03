@@ -1,10 +1,24 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 function App() {
   const [inputText, setInputText] = useState("");
   const [outputText, setOutputText] = useState("");
   const [mode, setMode] = useState("improve");
   const [loading, setLoading] = useState(false);
+  const outputRef = useRef(null);
+  const inputRef = useRef(null);
+
+  // 自動聚焦輸入框
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // 結果自動滾動到底
+  useEffect(() => {
+    if (outputRef.current) {
+      outputRef.current.scrollTop = outputRef.current.scrollHeight;
+    }
+  }, [outputText]);
 
   const handleSubmit = async () => {
     if (!inputText.trim()) {
@@ -31,6 +45,13 @@ function App() {
     }
   };
 
+  // 複製結果到剪貼簿
+  const handleCopy = () => {
+    if (outputText) {
+      navigator.clipboard.writeText(outputText);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
       <div className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-8 space-y-6">
@@ -39,6 +60,7 @@ function App() {
           輸入你的履歷內容，AI 將協助你優化或中翻英！
         </p>
         <textarea
+          ref={inputRef}
           className="w-full border border-blue-200 focus:border-blue-400 transition p-3 rounded-lg text-gray-700 resize-none"
           rows="5"
           placeholder="請輸入你的履歷內容..."
@@ -97,8 +119,19 @@ function App() {
           )}
         </button>
         <div>
-          <label className="block text-gray-600 font-medium mb-2">AI 優化結果</label>
+          <div className="flex items-center mb-2">
+            <label className="block text-gray-600 font-medium flex-1">AI 優化結果</label>
+            <button
+              className="ml-2 px-3 py-1 bg-gray-200 rounded text-sm hover:bg-gray-300 transition"
+              onClick={handleCopy}
+              disabled={!outputText}
+              title="複製結果"
+            >
+              複製
+            </button>
+          </div>
           <textarea
+            ref={outputRef}
             className="w-full border border-gray-200 p-3 rounded-lg bg-gray-50 text-gray-700 resize-none"
             rows="5"
             readOnly
