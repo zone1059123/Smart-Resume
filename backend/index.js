@@ -4,12 +4,28 @@ const cors = require("cors");
 const OpenAI = require("openai");
 
 if (!process.env.OPENAI_API_KEY) {
-  console.error(' 請設定 OPENAI_API_KEY 環境變數');
+  console.error('❌ 請設定 OPENAI_API_KEY 環境變數');
   process.exit(1);
 }
 
 const app = express();
-app.use(cors());
+
+// 明確指定允許的前端網址
+const allowedOrigin = "https://smart-resume-eight.vercel.app";
+
+app.use(cors({
+  origin: allowedOrigin,
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+// 處理所有 OPTIONS 預檢請求
+app.options('*', cors({
+  origin: allowedOrigin,
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 app.use(express.json());
 
 const openai = new OpenAI({
