@@ -10,36 +10,36 @@ if (!process.env.OPENAI_API_KEY) {
 
 const app = express();
 
-// 支援多個合法前端網址
+// 支援 smart-resume-xxx.vercel.app 及本地開發
 const allowedOrigins = [
-  "https://smart-resume-eight.vercel.app",
-  "https://smart-resume-plum.vercel.app",
-  // 你可以繼續加其他 Vercel 預覽網址或 localhost
-  "http://localhost:3000"
+  "http://localhost:3000", // 本地開發
+  "https://smart-resume-eight.vercel.app", // 你的正式站
 ];
 
+// 動態判斷 origin
+function checkOrigin(origin, callback) {
+  if (
+    !origin ||
+    allowedOrigins.includes(origin) ||
+    /^https:\/\/smart-resume-[\w-]+\.vercel\.app$/.test(origin)
+  ) {
+    // 允許
+    callback(null, origin);
+  } else {
+    // 不允許
+    callback(new Error("Not allowed by CORS"));
+  }
+}
+
 app.use(cors({
-  origin: function (origin, callback) {
-    // 允許本地開發時 origin 為 undefined
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, origin);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: checkOrigin,
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 // 處理所有 OPTIONS 預檢請求
 app.options('*', cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, origin);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: checkOrigin,
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
