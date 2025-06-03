@@ -14,14 +14,14 @@ function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ inputText, mode }),
-      });
+      });x
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       const data = await res.json();
       setOutputText(data.reply);
     } catch (err) {
-      setOutputText("❌ 請求失敗，請檢查伺服器是否啟動，或網路連線/URL 是否正確。\n" + err.message);
+      setOutputText("請求失敗，請檢查伺服器是否啟動，或網路連線/URL 是否正確。\n" + err.message);
     } finally {
       setLoading(false);
     }

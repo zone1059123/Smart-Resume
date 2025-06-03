@@ -4,7 +4,7 @@ const cors = require("cors");
 const OpenAI = require("openai");
 
 if (!process.env.OPENAI_API_KEY) {
-  console.error('❌ 請設定 OPENAI_API_KEY 環境變數');
+  console.error(' 請設定 OPENAI_API_KEY 環境變數');
   process.exit(1);
 }
 
