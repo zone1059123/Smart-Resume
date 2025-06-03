@@ -36,7 +36,7 @@ app.post("/api/gpt", async (req, res) => {
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: "你是一位履歷顧問，專門幫人優化履歷與翻譯。" },
         { role: "user", content: prompt }
