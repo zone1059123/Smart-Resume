@@ -10,7 +10,7 @@ function App() {
     setLoading(true);
     setOutputText("");
     try {
-      const res = await fetch("/api/gpt", {
+      const res = await fetch("https://smart-resume-1sx2.onrender.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ inputText, mode }),

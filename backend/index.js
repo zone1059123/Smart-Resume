@@ -52,5 +52,5 @@ app.post("/api/gpt", async (req, res) => {
 });
 
 app.listen(3001, () => {
-  console.log("Server running on http://localhost:3001");
+  console.log("Server running on https://smart-resume-1sx2.onrender.com");
 });
