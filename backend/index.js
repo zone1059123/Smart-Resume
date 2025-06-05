@@ -3,30 +3,27 @@ const express = require("express");
 const cors = require("cors");
 const OpenAI = require("openai");
 
-if (!process.env.OPENAI_API_KEY) {
-  console.error('❌ 請設定 OPENAI_API_KEY 環境變數');
+if (!process.env.GEMINI_API_KEY) {
+  console.error('❌ 請設定 GEMINI_API_KEY 環境變數');
   process.exit(1);
 }
 
 const app = express();
 
-// 支援 smart-resume-xxx.vercel.app 及本地開發
+// 支援所有 smart-resume-xxx.vercel.app 與本地開發
 const allowedOrigins = [
-  "http://localhost:3000", // 本地開發
-  "https://smart-resume-eight.vercel.app", // 你的正式站
+  "http://localhost:3000",
+  "https://smart-resume-eight.vercel.app",
 ];
 
-// 動態判斷 origin
 function checkOrigin(origin, callback) {
   if (
     !origin ||
     allowedOrigins.includes(origin) ||
     /^https:\/\/smart-resume-[\w-]+\.vercel\.app$/.test(origin)
   ) {
-    // 允許
     callback(null, origin);
   } else {
-    // 不允許
     callback(new Error("Not allowed by CORS"));
   }
 }
@@ -37,7 +34,6 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-// 處理所有 OPTIONS 預檢請求
 app.options('*', cors({
   origin: checkOrigin,
   methods: ["GET", "POST", "OPTIONS"],
@@ -46,8 +42,10 @@ app.options('*', cors({
 
 app.use(express.json());
 
+// 這裡用 Gemini API Key 和 Gemini endpoint
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY,
+  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
 });
 
 app.post("/api/gpt", async (req, res) => {
@@ -69,8 +67,9 @@ app.post("/api/gpt", async (req, res) => {
         return res.status(400).json({ error: "mode 參數錯誤" });
     }
 
+    // Gemini 支援 openai.chat.completions.create
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gemini-1.5-flash", // 或 gemini-1.5-pro、gemini-pro
       messages: [
         { role: "system", content: "你是一位履歷顧問，專門幫人優化履歷與翻譯。" },
         { role: "user", content: prompt }
@@ -81,7 +80,7 @@ app.post("/api/gpt", async (req, res) => {
     res.json({ reply });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "伺服器錯誤或 OpenAI API 失敗" });
+    res.status(500).json({ error: "伺服器錯誤或 Gemini API 失敗" });
   }
 });
 
